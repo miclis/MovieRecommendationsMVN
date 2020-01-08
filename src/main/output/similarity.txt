@@ -1,0 +1,11 @@
+Overall movie similarity consists of 3 factors with their multipliers representing the importance of each feature.
+Each factor is a value between (0 - 1) * MULTIPLIER.
+Multiplier values:
+- genres: 6 - most important
+- release year: 3
+- budget: 2
+
+Final formula:
+overallSimilarity = genresSimilarity * GENRES_MULTI + yearSimilarity * YEAR_MULTI + budgetSimilarity * BUDGET_MULTI
+
+* budgetSimilarity is only taken into account if both films have budget fields populated, otherwise it's 0.

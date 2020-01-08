@@ -1,0 +1,3 @@
+- genres - most important one, people usually like a genre of movies
+- release year  - similar year may lead to similar approach of directors and general state of popculture at the time
+- budget - similar budget may point to a similar quality
