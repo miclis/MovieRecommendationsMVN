@@ -1,11 +1,7 @@
-Overall movie similarity consists of 3 factors with their multipliers representing the importance of each feature.
-Each factor is a value between (0 - 1) * MULTIPLIER.
-Multiplier values:
-- genres: 6 - most important
-- release year: 3
-- budget: 2
+Two distinct users are compared based on movies they have both watched.
+The difference in their ratings is calculated, summed up and divided by the number of movies that they have both watched.
+This way an average difference per movie is calculated for a user pair.
 
-Final formula:
-overallSimilarity = genresSimilarity * GENRES_MULTI + yearSimilarity * YEAR_MULTI + budgetSimilarity * BUDGET_MULTI
+The value is then normalized (divided by MAX_DIFFERENCE = 5) and substracted from 1.
 
-* budgetSimilarity is only taken into account if both films have budget fields populated, otherwise it's 0.
+The similarity value is always a number between 0 and 1; 1 - meaning exact same and 0 means totally different taste.

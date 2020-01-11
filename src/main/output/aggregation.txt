@@ -1,0 +1,5 @@
+Similarly to the previous task Nearest Neighbours Aggregation was used.
+After finding most similar persons, 15 best are picked.
+Their ratings for a movie are multiplied by the corresponding similarity value.
+Then their are summed up and divided by the sum of their similarity factors, so the result is a rating value in range (0 - 5).
+In this approach the more similar a person is, the more meaningful his rating is.
