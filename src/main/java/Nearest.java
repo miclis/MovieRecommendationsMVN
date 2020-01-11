@@ -44,6 +44,11 @@ public class Nearest {
             // Get related movie features
             Features movieFeatures = featuresMap.get(taskRecord.get(2));
 
+            /*
+            * From training get all movies rated by this user and for each calculate similarity.
+            * Create a map with those similarity values and movie Ids.
+            * Create a map with ratings of the other movie and movie Ids.
+            * */
             userMovieRatingMap.get(taskRecord.get(1)).forEach(
                     userRating -> {   // for each multimap value
                         idSimilarityValueMap.put(
@@ -52,7 +57,7 @@ public class Nearest {
                         idRatingMap.put(userRating.getMovieId(), userRating.getRating());
                     });
 
-            // <Id, Similarity Value>
+            // <Id, Similarity Value> Map only with best movies
             Map<Integer, Double> bestMoviesMap = idSimilarityValueMap.entrySet().stream()
                     .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                     .limit(LIMIT_OF_MOVIES)
@@ -61,10 +66,15 @@ public class Nearest {
             List<Double> ratings = new ArrayList<>();
             List<Double> similarityList = new ArrayList<>();
 
+            /*
+            * Create List with ratings * similarity.
+            * Create List with similarities.
+            * */
             bestMoviesMap.forEach((id, similarityValue) -> {
                 ratings.add(idRatingMap.get(id) * similarityValue);
                 similarityList.add(similarityValue);
             });
+            // SUM(rating * similarity) / SUM(similarity)
             double res = ratings.stream().mapToDouble(Double::valueOf).sum() / similarityList.stream().mapToDouble(Double::valueOf).sum();
 
             // Add predicted rating for the record
