@@ -10,6 +10,13 @@ public class UserComparator {
 
     private static final int MAX_DIFFERENCE = 5;
 
+    /**
+     * Method to compare two users and calculate their similarity value.
+     * @param userMovieRatingMap Multimap<Integer, UserRating> containing users' movie ratings
+     * @param userId1 Id of the first user
+     * @param userId2 Id of the second user
+     * @return double representing the similarity value.
+     */
     public static double compareUsers(Multimap<Integer, UserRating> userMovieRatingMap, int userId1, int userId2) {
 
         Collection<UserRating> user1MovieRatings = userMovieRatingMap.get(userId1);
