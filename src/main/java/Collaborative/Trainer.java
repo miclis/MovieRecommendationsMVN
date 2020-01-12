@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
+@SuppressWarnings("DuplicatedCode")
 public class Trainer {
 
     private static final int K = 1;
@@ -21,7 +22,7 @@ public class Trainer {
      * @param polynomial polynomial description
      * @param trainSet training set
      */
-    private static int train(int N, Double[][] polynomial, Double[][] trainSet, boolean zeroParameter) {
+    private static int train(int N, Double[][] polynomial, Double[][] trainSet) {
 
         // Copy inputs from sets
         Double[][] inputs = new Double[trainSet.length][];
@@ -53,13 +54,7 @@ public class Trainer {
 
                 // Calculate average distances
                 for (int j = 0; j < polynomial.length; j++) {   // for different input values
-                    if (polynomial[j][0] == 0) {
-                        if (zeroParameter) {
-                            averageDist[j] += error;
-                        }
-                    } else {
-                        averageDist[j] +=error * inputs[i][polynomial[j][0].intValue() - 1];
-                    }
+                    averageDist[j] += polynomial[j][0] == 0 ? error : error * inputs[i][polynomial[j][0].intValue() - 1];
                 }
             }
 
@@ -82,6 +77,14 @@ public class Trainer {
         return iterations;
     }
 
+
+    /**
+     * Method to create polynomial definitions for users and features, and train them both using provided inputs.
+     * @param N number of elements
+     * @param trainDataUserFirst List<List<Pair<Integer, Integer>>> (in our custom order) containing training records; userId is the first value, rating is second
+     * @param trainDataMovieFirst List<List<Pair<Integer, Integer>>> (in our custom order) containing training records; movieId is the first value, rating is second
+     * @return trained user polynomial and feature polynomial
+     */
     public static Pair<List<Double[][]>, List<Double[][]>> createAndTrainBoth(int N, List<List<Pair<Integer, Integer>>> trainDataUserFirst, List<List<Pair<Integer, Integer>>> trainDataMovieFirst) {
 
         // Create polynomials
@@ -95,6 +98,7 @@ public class Trainer {
         trainDataUserFirst.forEach(trainUserFirst -> userPolynomials.add(ConvertUtil.getDescription(N, K)));
 
         IntStream.range(0, MAX_ITERATIONS).forEach(i -> {
+
             if (i % 2 == 0) {
                 for (int j = 0; j < trainDataUserFirst.size(); j++) {
 
@@ -108,7 +112,7 @@ public class Trainer {
                         featuresValues[k][N] = Double.valueOf(trainDataUserFirst.get(j).get(k).getValue());
                     }
 
-                    Trainer.train(N, userPolynomials.get(j), featuresValues, true);
+                    Trainer.train(N, userPolynomials.get(j), featuresValues);
                 }
             } else {
                 for (int j = 0; j < trainDataMovieFirst.size(); j++) {
@@ -123,7 +127,7 @@ public class Trainer {
                         userValues[k][N] = Double.valueOf(trainDataMovieFirst.get(j).get(k).getValue());
                     }
 
-                    Trainer.train(N, featuresPolynomials.get(j), userValues, false);
+                    Trainer.train(N, featuresPolynomials.get(j), userValues);
                 }
             }
         });

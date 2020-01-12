@@ -2,7 +2,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import Collaborative.*;
+import Collaborative.Calculator;
+import Collaborative.Trainer;
 import javafx.util.Pair;
 
 public class CollaborativeFiltering {
@@ -66,6 +67,7 @@ public class CollaborativeFiltering {
         // Create calculator instance
         Calculator calculator = new Calculator(N, 1);
 
+        assert taskData != null;
         List<Integer> results = taskData.stream()
                 .map(taskRecord -> (int) (calculator.calculate(userPolynomialList.get(usersInOrder.indexOf(taskRecord.get(1))),
                         new Double[][]{featureInputs[moviesInOrder.indexOf(taskRecord.get(2))]})[0] + 0.5))
