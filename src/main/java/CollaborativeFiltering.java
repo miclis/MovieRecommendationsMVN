@@ -8,7 +8,7 @@ import javafx.util.Pair;
 
 public class CollaborativeFiltering {
 
-    private static final int N = 8;
+    private static final int N = 10;
 
     public static void main(String[] args) {
         // Load resources
@@ -23,7 +23,7 @@ public class CollaborativeFiltering {
         List<Integer> usersInOrder = new ArrayList<>();
         List<Integer> moviesInOrder = new ArrayList<>();
 
-        // Read training data
+        // Prepare training data
         assert trainData != null;
         for (List<Integer> trainRecord : trainData) { //
             Integer userId = trainRecord.get(1);
@@ -40,6 +40,7 @@ public class CollaborativeFiltering {
             }
         }
 
+        // Prepare training data in internal custom order
         for (List<Integer> trainRecord : trainData) { //
             Integer userId = trainRecord.get(1);
             Integer movieId = trainRecord.get(2);
@@ -52,12 +53,13 @@ public class CollaborativeFiltering {
             trainDataMovieFirst.get(internalMovieId).add(new Pair<>(internalUserId, rating));
         }
 
+        // Create and train polynomial descriptions for users and features
         Pair<List<Double[][]>, List<Double[][]>> polynomialDescriptions = Trainer.createAndTrainBoth(N, trainDataUserFirst, trainDataMovieFirst);
         List<Double[][]> userPolynomialList = polynomialDescriptions.getKey();
         List<Double[][]> featurePolynomialList = polynomialDescriptions.getValue();
 
-        Double[][] featureInputs = new Double[polynomialDescriptions.getValue().size()][N];
-
+        // Prepare inputs for calculations for each movie
+        Double[][] featureInputs = new Double[featurePolynomialList.size()][N];
         for (int i = 0; i < featurePolynomialList.size(); i++) {
             for (int j = 0; j < N; j++) {
                 featureInputs[i][j] = featurePolynomialList.get(i)[j][1];
@@ -67,6 +69,7 @@ public class CollaborativeFiltering {
         // Create calculator instance
         Calculator calculator = new Calculator(N, 1);
 
+        // Calculate predictions for each record using polynomial of a user and polynomial of the movie
         assert taskData != null;
         List<Integer> results = taskData.stream()
                 .map(taskRecord -> (int) (calculator.calculate(userPolynomialList.get(usersInOrder.indexOf(taskRecord.get(1))),
@@ -83,7 +86,5 @@ public class CollaborativeFiltering {
         submissionsData.forEach(record -> record.add(results.remove(0)));
         // Write predicted values to file
         Loader.saveSubmissions(submissionsData);
-
-
     }
 }

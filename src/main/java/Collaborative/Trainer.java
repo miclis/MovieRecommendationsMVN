@@ -14,7 +14,7 @@ public class Trainer {
     private static final int K = 1;
     private static final Double alpha = 0.1;
     private static final Double MIN_CHANGE = 1e-16;
-    private static final int MAX_ITERATIONS = 10000;
+    private static final int MAX_ITERATIONS = 5000;
 
     /**
      * Method to train polynomial
@@ -97,38 +97,38 @@ public class Trainer {
         });
         trainDataUserFirst.forEach(trainUserFirst -> userPolynomials.add(ConvertUtil.getDescription(N, K)));
 
+        // Train polynomials
         IntStream.range(0, MAX_ITERATIONS).forEach(i -> {
+            // Train userPolynomial using features for inputs
+            for (int j = 0; j < trainDataUserFirst.size(); j++) {
 
-            if (i % 2 == 0) {
-                for (int j = 0; j < trainDataUserFirst.size(); j++) {
+                Double[][] featuresValues = new Double[trainDataUserFirst.get(j).size()][N + 2];
 
-                    Double[][] featuresValues = new Double[trainDataUserFirst.get(j).size()][N + 2];
-
-                    for (int k = 0; k < trainDataUserFirst.get(j).size(); k++) {
-                        for (int l = 0; l < N; l++) {
-                            featuresValues[k][l] = featuresPolynomials.get(trainDataUserFirst.get(j).get(k).getKey())[l][1];
-                        }
-
-                        featuresValues[k][N] = Double.valueOf(trainDataUserFirst.get(j).get(k).getValue());
+                for (int k = 0; k < trainDataUserFirst.get(j).size(); k++) {
+                    for (int l = 0; l < N; l++) {
+                        featuresValues[k][l] = featuresPolynomials.get(trainDataUserFirst.get(j).get(k).getKey())[l][1];
                     }
 
-                    Trainer.train(N, userPolynomials.get(j), featuresValues);
+                    featuresValues[k][N] = Double.valueOf(trainDataUserFirst.get(j).get(k).getValue());
                 }
-            } else {
-                for (int j = 0; j < trainDataMovieFirst.size(); j++) {
 
-                    Double[][] userValues = new Double[trainDataMovieFirst.get(j).size()][N + 2];
+                Trainer.train(N, userPolynomials.get(j), featuresValues);
+            }
 
-                    for (int k = 0; k < trainDataMovieFirst.get(j).size(); k++) {
-                        for (int l = 0; l < N; l++) {
-                            userValues[k][l] = userPolynomials.get(trainDataMovieFirst.get(j).get(k).getKey())[l][1];
-                        }
+            // Train features polynomial using users for inputs
+            for (int j = 0; j < trainDataMovieFirst.size(); j++) {
 
-                        userValues[k][N] = Double.valueOf(trainDataMovieFirst.get(j).get(k).getValue());
+                Double[][] userValues = new Double[trainDataMovieFirst.get(j).size()][N + 2];
+
+                for (int k = 0; k < trainDataMovieFirst.get(j).size(); k++) {
+                    for (int l = 0; l < N; l++) {
+                        userValues[k][l] = userPolynomials.get(trainDataMovieFirst.get(j).get(k).getKey())[l][1];
                     }
 
-                    Trainer.train(N, featuresPolynomials.get(j), userValues);
+                    userValues[k][N] = Double.valueOf(trainDataMovieFirst.get(j).get(k).getValue());
                 }
+
+                Trainer.train(N, featuresPolynomials.get(j), userValues);
             }
         });
 
