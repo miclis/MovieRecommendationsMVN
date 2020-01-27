@@ -23,7 +23,8 @@ public class CollaborativeFiltering {
         List<Integer> usersInOrder = new ArrayList<>();
         List<Integer> moviesInOrder = new ArrayList<>();
 
-        // Prepare training data
+        // Prepare helper index lists
+        // Remove unknowns from the "matrix"
         assert trainData != null;
         for (List<Integer> trainRecord : trainData) { //
             Integer userId = trainRecord.get(1);
@@ -41,7 +42,7 @@ public class CollaborativeFiltering {
         }
 
         // Prepare training data in internal custom order
-        for (List<Integer> trainRecord : trainData) { //
+        for (List<Integer> trainRecord : trainData) {
             Integer userId = trainRecord.get(1);
             Integer movieId = trainRecord.get(2);
             Integer rating = trainRecord.get(3);
@@ -62,18 +63,18 @@ public class CollaborativeFiltering {
         Double[][] featureInputs = new Double[featurePolynomialList.size()][N];
         for (int i = 0; i < featurePolynomialList.size(); i++) {
             for (int j = 0; j < N; j++) {
-                featureInputs[i][j] = featurePolynomialList.get(i)[j][1];
+                featureInputs[i][j] = featurePolynomialList.get(i)[j][1];   // get weight of each feature
             }
         }
 
         // Create calculator instance
         Calculator calculator = new Calculator(N, 1);
 
-        // Calculate predictions for each record using polynomial of a user and polynomial of the movie
+        // Calculate predictions for each record using polynomial of a user and polynomial of the movie (weights) as inputs
         assert taskData != null;
         List<Integer> results = taskData.stream()
                 .map(taskRecord -> (int) (calculator.calculate(userPolynomialList.get(usersInOrder.indexOf(taskRecord.get(1))),
-                        new Double[][]{featureInputs[moviesInOrder.indexOf(taskRecord.get(2))]})[0] + 0.5))
+                        new Double[][]{featureInputs[moviesInOrder.indexOf(taskRecord.get(2))]})[0] + 0.5)) // 0.5 for better rounding; always takes 0 as this is only a helper structure to reuse old function
                 .map(rating -> {
                     if (rating < 0) rating = 0;
                     if (rating > 5) rating = 5;

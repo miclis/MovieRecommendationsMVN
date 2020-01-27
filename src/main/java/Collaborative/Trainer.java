@@ -41,7 +41,7 @@ public class Trainer {
 
         // Main iteration
         int iterations;
-        for (iterations = 0; iterations < 1 && ifContinue; iterations++) {  // until iterations goal reached or change to small
+        for (iterations = 0; iterations < 1 && ifContinue; iterations++) {  // For movieRecomendations train once
 
             // Create var for errors
             double error;
@@ -62,7 +62,7 @@ public class Trainer {
 
             // Check if change too small
             for (int i = 0; i < N + 1; i++) {
-                if (Math.abs(previousParams[i] - polynomial[i][K]) > MIN_CHANGE) {
+                if (Math.pow(previousParams[i] - polynomial[i][K], 2) > MIN_CHANGE) {
                     break;  // optimization
                 }
                 ifContinue = false;   // weight change was smaller than MIN_CHANGE
@@ -83,7 +83,7 @@ public class Trainer {
      * @param N number of elements
      * @param trainDataUserFirst List<List<Pair<Integer, Integer>>> (in our custom order) containing training records; userId is the first value, rating is second
      * @param trainDataMovieFirst List<List<Pair<Integer, Integer>>> (in our custom order) containing training records; movieId is the first value, rating is second
-     * @return trained user polynomial and feature polynomial
+     * @return trained user polynomials and feature polynomials
      */
     public static Pair<List<Double[][]>, List<Double[][]>> createAndTrainBoth(int N, List<List<Pair<Integer, Integer>>> trainDataUserFirst, List<List<Pair<Integer, Integer>>> trainDataMovieFirst) {
 
@@ -109,10 +109,10 @@ public class Trainer {
                         featuresValues[k][l] = featuresPolynomials.get(trainDataUserFirst.get(j).get(k).getKey())[l][1];
                     }
 
-                    featuresValues[k][N] = Double.valueOf(trainDataUserFirst.get(j).get(k).getValue());
+                    featuresValues[k][N] = Double.valueOf(trainDataUserFirst.get(j).get(k).getValue()); // values from first "matrix" for user for movie
                 }
 
-                Trainer.train(N, userPolynomials.get(j), featuresValues);
+                train(N, userPolynomials.get(j), featuresValues);   // train using ratings for movies as expected outputs
             }
 
             // Train features polynomial using users for inputs
@@ -128,7 +128,7 @@ public class Trainer {
                     userValues[k][N] = Double.valueOf(trainDataMovieFirst.get(j).get(k).getValue());
                 }
 
-                Trainer.train(N, featuresPolynomials.get(j), userValues);
+                train(N, featuresPolynomials.get(j), userValues);
             }
         });
 
