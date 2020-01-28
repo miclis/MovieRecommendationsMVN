@@ -52,17 +52,17 @@ public class Trainer {
             for (int i = 0; i < trainSet.length; i++) { // for each line
                 error = calculator.calculateSingle(polynomial, inputs[i]) - trainSet[i][N]; // calculate error in respect to value from training set
 
-                // Calculate average distances
+                // Calculate average distances = mse = gradients
                 for (int j = 0; j < polynomial.length; j++) {   // for different input values
-                    averageDist[j] += polynomial[j][0] == 0 ? error : error * inputs[i][polynomial[j][0].intValue() - 1];
+                    averageDist[j] += polynomial[j][0] == 0 ? error : error * inputs[i][polynomial[j][0].intValue() - 1];   // partial derivatives
                 }
             }
 
-            averageDist = Arrays.stream(averageDist).map(val -> val / trainSet.length).toArray(Double[]::new);
+            averageDist = Arrays.stream(averageDist).map(val -> val / trainSet.length).toArray(Double[]::new);  // average mse
 
             // Check if change too small
             for (int i = 0; i < N + 1; i++) {
-                if (Math.pow(previousParams[i] - polynomial[i][K], 2) > MIN_CHANGE) {
+                if (Math.abs(previousParams[i] - polynomial[i][K]) > MIN_CHANGE) {
                     break;  // optimization
                 }
                 ifContinue = false;   // weight change was smaller than MIN_CHANGE
@@ -71,7 +71,7 @@ public class Trainer {
             // Save last params & adjust for next iteration
             for (int i = 0; i < N + 1; i++) {
                 previousParams[i] = polynomial[i][K];
-                polynomial[i][K] = polynomial[i][K] - (alpha * averageDist[i]);
+                polynomial[i][K] = polynomial[i][K] - (alpha * averageDist[i]); // gradient descent
             }
         }
         return iterations;
